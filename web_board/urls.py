@@ -14,6 +14,8 @@ urlpatterns = [
     url(r'^$', views.home, name='home'),     # Or: path('boards/', include('boards.urls')),
     url(r'^board/(?P<pk>\d+)$', views.board_topics, name='board_topics'),
     url(r'^board/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
+    url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/$', views.topic_post, name='topic_post'),
+    url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/reply/$', views.reply_post, name='reply_post'),
     
     url(r'^signup/$', acc_views.signup, name='signup'),
     url(r'^logout/$', auth_views.LogoutView.as_view(), name='logout'),
