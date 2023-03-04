@@ -3,7 +3,12 @@ from .models import Board, Topic, Post
 from .forms import NewTopicForm, PostForm
 from django.contrib.auth.models import User
 from django.contrib.auth.decorators import login_required
+from django.utils.decorators import method_decorator
 from django.db.models import Count
+
+from django.views.generic import CreateView, UpdateView
+
+from django.urls import reverse_lazy
 
 # Create your views here.
 def home(request):
@@ -71,3 +76,50 @@ def reply_post(request, pk, topic_pk):
         form = PostForm()
     
     return render(request, 'reply_topic.html', {'topic':topic, 'form':form})
+
+# class ReplyPostView(CreateView):
+#     model = Post
+#     form_class = PostForm
+#     success_url = reverse_lazy('topic_post')
+#     template_name = 'new_post.html'
+    
+    # def get_topic(self, board_pk, topic_pk):
+    #     self.topic = get_object_or_404(Topic, pk=topic_pk, board__pk=board_pk)
+        
+    # def _render(self, request):
+    #     return render(request, 'reply_topic.html', {'topic':self.topic, 'form':self.form})
+    
+    # def get(self, request, pk, topic_pk):
+    #     self.get_topic(pk, topic_pk)
+    #     self.form = PostForm()
+    #     return self._render(request)
+    
+    # def post(self, request, pk, topic_pk):
+    #     self.get_topic(pk, topic_pk)
+    #     self.form = PostForm(request.POST)
+    #     if self.form.is_valid():
+    #         post = self.form.save(commit=False)
+    #         post.topic = self.topic
+    #         post.created_by = request.user
+    #         post.save()
+    #         return redirect('topic_post', pk=pk, topic_pk=topic_pk)
+    #     return self._render(request)
+    
+
+@method_decorator(login_required, name='dispatch')
+class PostUpdateView(UpdateView):
+    model = Post
+    fields = ('message', )
+    template_name = 'edit_post.html'
+    pk_url_kwarg = 'post_pk'
+    context_object_name = 'post'
+
+    def get_queryset(self):
+        queryset = super().get_queryset()
+        return queryset.filter(created_by=self.request.user)
+
+    def form_valid(self, form):
+        post = form.save(commit=False)
+        post.updated_by = self.request.user
+        post.save()
+        return redirect('topic_post', pk=post.topic.board.pk, topic_pk=post.topic.pk)
