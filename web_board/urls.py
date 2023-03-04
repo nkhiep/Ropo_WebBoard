@@ -11,11 +11,11 @@ urlpatterns = [
     path('grappelli/', include('grappelli.urls')),
     path('admin/', admin.site.urls),
     
-    url(r'^$', views.home, name='home'),     # Or: path('boards/', include('boards.urls')),
-    url(r'^board/(?P<pk>\d+)$', views.board_topics, name='board_topics'),
+    url(r'^$', views.BoardListView.as_view(), name='home'),     # Or: path('boards/', include('boards.urls')),
+    url(r'^board/(?P<pk>\d+)$', views.TopicListView.as_view(), name='board_topics'),
     url(r'^board/(?P<pk>\d+)/new/$', views.new_topic, name='new_topic'),
-    url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/$', views.topic_post, name='topic_post'),
-    url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/reply/$', views.reply_post, name='reply_post'),
+    url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/$', views.PostListView.as_view(), name='topic_post'),
+    url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/reply/$', views.ReplyPostView.as_view(), name='reply_post'),
     url(r'^board/(?P<pk>\d+)/topic/(?P<topic_pk>\d+)/post/(?P<post_pk>\d+)/edit/$',
         views.PostUpdateView.as_view(), name='edit_post'),
     
@@ -51,4 +51,6 @@ urlpatterns = [
     url(r'^settings/password/done/$',
         auth_views.PasswordChangeDoneView.as_view(template_name='password_change_done.html'),
         name='password_change_done'),
+    
+    url(r'^settings/account/$', acc_views.UserUpdateView.as_view(), name='my_account'),
 ]
